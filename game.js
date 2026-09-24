@@ -17,7 +17,7 @@ const resetBtn=document.querySelector('#resetBtn');
 const newBtn=document.querySelector('#newBtn');
 const nextBtn=document.querySelector('#nextBtn');
 
-let levelIndex=0,state=[],startState=[],moves=0,startTime=0,timer=null,completed=false;
+let levelIndex=0,state=[],startState=[],moves=0,startTime=0,sessionStart=0,totalMoves=0,timer=null,completed=false;
 
 function blank(n){return Array.from({length:n},()=>Array(n).fill(0))}
 function clone(a){return a.map(row=>row.slice())}
@@ -27,7 +27,7 @@ function toggle(r,c,n){
 function press(r,c){
   const n=state.length;
   [[r,c],[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>toggle(rr,cc,n));
-  moves++;
+  moves++;totalMoves++;
   render();
   if(moves===1) hintEl.textContent='Exactly: this stone and the four stones beside it changed.';
   if(isSolved()) finishLevel();
@@ -65,8 +65,14 @@ function formatTime(sec){
   const s=String(sec%60).padStart(2,'0');
   return m+':'+s;
 }
-function updateTime(){timeLabel.textContent=formatTime(Math.floor((Date.now()-startTime)/1000))}
-function startTimer(){clearInterval(timer);startTime=Date.now();timer=setInterval(updateTime,1000);updateTime()}
+function updateTime(){timeLabel.textContent=formatTime(Math.floor((Date.now()-sessionStart)/1000))}
+function startTimer(){
+  clearInterval(timer);
+  if(!sessionStart) sessionStart=Date.now();
+  startTime=Date.now();
+  timer=setInterval(updateTime,1000);
+  updateTime();
+}
 function loadLevel(index){
   levelIndex=index;completed=false;moves=0;completeEl.classList.add('hidden');
   const level=LEVELS[levelIndex];
@@ -77,17 +83,21 @@ function loadLevel(index){
 function finishLevel(){
   if(completed)return;
   completed=true;clearInterval(timer);
-  const seconds=Math.floor((Date.now()-startTime)/1000);
+  const levelSeconds=Math.floor((Date.now()-startTime)/1000);
+  const totalSeconds=Math.floor((Date.now()-sessionStart)/1000);
   const last=levelIndex===LEVELS.length-1;
   completeTitle.textContent=last?'You beat Stone Puzzle!':'Level complete';
   completeText.textContent=last
-    ?`26 levels cleared · ${moves} moves on the final level · ${formatTime(seconds)} on the final level.`
-    :`Level ${levelIndex+1} cleared in ${moves} moves and ${formatTime(seconds)}.`;
+    ?`26 levels cleared · ${totalMoves} total moves · ${formatTime(totalSeconds)} total play time.`
+    :`Level ${levelIndex+1} cleared in ${moves} moves and ${formatTime(levelSeconds)}.`;
   nextBtn.textContent=last?'Play again':'Next level';
   completeEl.classList.remove('hidden');
 }
 resetBtn.addEventListener('click',()=>{state=clone(startState);moves=0;completed=false;completeEl.classList.add('hidden');render();startTimer()});
 newBtn.addEventListener('click',()=>loadLevel(levelIndex));
-nextBtn.addEventListener('click',()=>loadLevel(levelIndex===LEVELS.length-1?0:levelIndex+1));
+nextBtn.addEventListener('click',()=>{
+  if(levelIndex===LEVELS.length-1){totalMoves=0;sessionStart=Date.now();}
+  loadLevel(levelIndex===LEVELS.length-1?0:levelIndex+1);
+});
 
 loadLevel(0);
