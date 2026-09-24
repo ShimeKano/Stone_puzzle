@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Stone Puzzle</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">STONE PUZZLE</p>
+        <h1>Turn every stone white.</h1>
+      </div>
+      <div class="stats">
+        <span id="levelLabel">Level 1 / 26</span>
+        <span id="movesLabel">0 moves</span>
+        <span id="timeLabel">00:00</span>
+      </div>
+    </header>
+
+    <section class="game-card" aria-label="Stone Puzzle game">
+      <div class="board-wrap">
+        <div id="board" class="board" role="grid" aria-label="Puzzle board"></div>
+      </div>
+      <div class="hint" id="hint">Tap a stone. It and the stones beside it will change.</div>
+      <div class="actions">
+        <button id="resetBtn" type="button">Reset</button>
+        <button id="newBtn" class="primary" type="button">New puzzle</button>
+      </div>
+    </section>
+
+    <section id="complete" class="complete hidden" aria-live="polite">
+      <div class="complete-card">
+        <div class="complete-icon">✦</div>
+        <p class="eyebrow">PUZZLE CLEARED</p>
+        <h2 id="completeTitle">Level complete</h2>
+        <p id="completeText"></p>
+        <button id="nextBtn" class="primary" type="button">Next level</button>
+      </div>
+    </section>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
